@@ -10,7 +10,6 @@ import { api } from "~/utils/api";
 import { Button } from "./Button";
 import { ProfileImage } from "./ProfileImage";
 import { TRPCClientError } from "@trpc/client";
-import { z } from "zod";
 import { toast } from "react-toastify";
 
 function updateTextAreaSize(textArea?: HTMLTextAreaElement) {
