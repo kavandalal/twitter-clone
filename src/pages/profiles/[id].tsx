@@ -15,6 +15,7 @@ import { ProfileImage } from "~/components/ProfileImage";
 import { InfiniteTweetList } from "~/components/InfiniteTweetList";
 import { useSession } from "next-auth/react";
 import { Button } from "~/components/Button";
+import { toast } from "react-toastify";
 
 const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
   id,
@@ -29,6 +30,10 @@ const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
     onSuccess: ({ addedFollow }) => {
       trpcUtils.profile.getById.setData({ id }, (oldData) => {
         if (oldData == null) return;
+
+        toast.success(
+          `Successfully ${addedFollow ? "" : "un"}followed ${oldData.name}`,
+        );
 
         const countModifier = addedFollow ? 1 : -1;
         return {

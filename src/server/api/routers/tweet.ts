@@ -55,7 +55,7 @@ export const tweetRouter = createTRPCRouter({
     ),
 
   create: protectedProcedure
-    .input(z.object({ content: z.string() }))
+    .input(z.object({ content: z.string().min(5).nonempty() }))
     .mutation(async ({ input: { content }, ctx }) => {
       const tweet = await ctx.prisma.tweet.create({
         data: { content, userId: ctx.session.user.id },

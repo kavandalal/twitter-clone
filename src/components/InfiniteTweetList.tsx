@@ -8,6 +8,7 @@ import { IconHoverEffect } from "./IconHoverEffect";
 import { api } from "~/utils/api";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { Button } from "./Button";
+import { toast } from "react-toastify";
 
 type Tweet = {
   id: string;
@@ -159,6 +160,8 @@ function TweetCard({
         typeof trpcUtils.tweet.infiniteFeed.setInfiniteData
       >[1] = (oldData) => {
         if (oldData == null) return;
+
+        toast.success(`Successfully deleted tweet`);
 
         return {
           ...oldData,

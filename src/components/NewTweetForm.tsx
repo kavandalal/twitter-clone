@@ -9,6 +9,9 @@ import {
 import { api } from "~/utils/api";
 import { Button } from "./Button";
 import { ProfileImage } from "./ProfileImage";
+import { TRPCClientError } from "@trpc/client";
+import { z } from "zod";
+import { toast } from "react-toastify";
 
 function updateTextAreaSize(textArea?: HTMLTextAreaElement) {
   if (textArea == null) return;
@@ -58,6 +61,7 @@ function Form() {
             image: session.data.user.image || null,
           },
         };
+        toast.success(`Successfully added Tweet`);
 
         return {
           ...oldData,
@@ -70,6 +74,14 @@ function Form() {
           ],
         };
       });
+    },
+    onError: (err) => {
+      if (err instanceof TRPCClientError) {
+        const error =
+          err.data.zodError?.fieldErrors?.content?.[0] ||
+          err.data.zodError?.formErrors?.content?.[0];
+        toast.error(error);
+      }
     },
   });
 
