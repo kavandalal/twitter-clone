@@ -20,7 +20,7 @@ export const profileRouter = createTRPCRouter({
           image: true,
           _count: { select: { followers: true, follows: true, tweets: true } },
           followers:
-            currentUserId == null
+            currentUserId === null
               ? undefined
               : { where: { id: currentUserId } },
         },
@@ -37,6 +37,7 @@ export const profileRouter = createTRPCRouter({
         isFollowing: profile.followers.length > 0,
       };
     }),
+
   toggleFollow: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ input: { userId }, ctx }) => {
