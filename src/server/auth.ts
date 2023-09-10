@@ -6,6 +6,7 @@ import {
 } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import moment from "moment";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 
@@ -39,6 +40,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     session: ({ session, user }) => ({
       ...session,
+      expires: String(moment(new Date()).add("5", "minutes")),
       user: {
         ...session.user,
         id: user.id,
