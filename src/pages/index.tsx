@@ -1,6 +1,9 @@
 import { type NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { InfiniteTweetList } from "~/components/InfiniteTweetList";
+import { NewTweetForm } from "~/components/NewTweetForm";
+import { api } from "~/utils/api";
 
 const TABS = ["Recent", "Following"] as const;
 
@@ -32,8 +35,49 @@ const Home: NextPage = () => {
           </div>
         )}
       </header>
+      <NewTweetForm />
+      {selectedTab === "Recent" ? <RecentTweets /> : <FollowingTweets />}
     </>
   );
 };
+
+function RecentTweets() {
+  const tweets = api.tweet.infiniteFeed.useInfiniteQuery(
+    {},
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
+  );
+  console.log(
+    "tweets.data ++ ",
+    tweets.data?.pages,
+    tweets.data?.pages.flatMap((page) => page.tweets),
+  );
+
+  return (
+    <InfiniteTweetList
+      tweets={tweets.data?.pages.flatMap((page) => page.tweets)}
+      isError={tweets.isError}
+      isLoading={tweets.isLoading}
+      hasMore={tweets.hasNextPage}
+      fetchNewTweets={tweets.fetchNextPage}
+    />
+  );
+}
+
+function FollowingTweets() {
+  const tweets = api.tweet.infiniteFeed.useInfiniteQuery(
+    { onlyFollowing: true },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
+  );
+
+  return (
+    <InfiniteTweetList
+      tweets={tweets.data?.pages.flatMap((page) => page.tweets)}
+      isError={tweets.isError}
+      isLoading={tweets.isLoading}
+      hasMore={tweets.hasNextPage}
+      fetchNewTweets={tweets.fetchNextPage}
+    />
+  );
+}
 
 export default Home;

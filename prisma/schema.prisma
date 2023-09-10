@@ -22,6 +22,7 @@ model Tweet {
   likes Like[]
 
   @@unique([createdAt, id])
+  //@kd the above line means that every tweet will have the combination of createdAt and id (createdAt_id) as unique 
   @@index([userId])
 }
 
