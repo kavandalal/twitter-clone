@@ -58,12 +58,16 @@ const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
         <ProfileImage src={profile.image} className="flex-shrink-0" />
         <div className="ml-2 flex-grow">
           <h1 className="text-lg font-bold">{profile.name}</h1>
-          <div className="text-gray-500">
+          <div className="flex text-gray-500">
             {profile.tweetsCount}{" "}
-            {getPlural(profile.tweetsCount, "Tweet", "Tweets")} -{" "}
+            {getPlural(profile.tweetsCount, "Tweet", "Tweets")}
+            <br className="block sm:hidden" />{" "}
+            <span className="hidden sm:block"> - </span>{" "}
             {profile.followersCount}{" "}
-            {getPlural(profile.followersCount, "Follower", "Followers")} -{" "}
-            {profile.followsCount} Following
+            {getPlural(profile.followersCount, "Follower", "Followers")}
+            <br className="block sm:hidden" />{" "}
+            <span className="hidden sm:block"> - </span> {profile.followsCount}{" "}
+            Following
           </div>
         </div>
         <FollowButton

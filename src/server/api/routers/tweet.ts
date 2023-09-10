@@ -83,6 +83,17 @@ export const tweetRouter = createTRPCRouter({
         return { addedLike: false };
       }
     }),
+
+  deleteTweet: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input: { id }, ctx }) => {
+      const data = { tweetId: id, userId: ctx.session.user.id };
+
+      const deletedTweet = await ctx.prisma.tweet.delete({
+        where: { id, userId: data.userId },
+      });
+      return { deletedTweet };
+    }),
 });
 
 async function getInfiniteTweets({

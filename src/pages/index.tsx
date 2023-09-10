@@ -46,11 +46,6 @@ function RecentTweets() {
     {},
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   );
-  console.log(
-    "tweets.data ++ ",
-    tweets.data?.pages,
-    tweets.data?.pages.flatMap((page) => page.tweets),
-  );
 
   return (
     <InfiniteTweetList

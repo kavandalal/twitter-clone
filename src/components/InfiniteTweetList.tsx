@@ -3,9 +3,11 @@ import Link from "next/link";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { ProfileImage } from "./ProfileImage";
 import { VscHeart, VscHeartFilled } from "react-icons/vsc";
+import { AiFillDelete } from "react-icons/ai";
 import { IconHoverEffect } from "./IconHoverEffect";
 import { api } from "~/utils/api";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { Button } from "./Button";
 
 type Tweet = {
   id: string;
@@ -59,6 +61,34 @@ export function InfiniteTweetList({
 const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: "short",
 });
+
+function DeleteButton({
+  userId,
+  isLoading,
+  onClick,
+}: {
+  userId: string;
+  isLoading: boolean;
+  onClick: () => void;
+}) {
+  const session = useSession();
+
+  if (session.status !== "authenticated" || session.data.user.id !== userId) {
+    return null;
+  }
+
+  return (
+    <Button
+      disabled={isLoading}
+      onClick={onClick}
+      small
+      className="bg-white"
+      gray
+    >
+      <AiFillDelete fill="red" />
+    </Button>
+  );
+}
 
 function TweetCard({
   id,
@@ -115,22 +145,54 @@ function TweetCard({
     toggleLike.mutate({ id });
   }
 
+  const deleteTweet = api.tweet.deleteTweet.useMutation({
+    onSuccess: ({ deletedTweet }) => {
+      const updateData: Parameters<
+        typeof trpcUtils.tweet.infiniteFeed.setInfiniteData
+      >[1] = (oldData) => {
+        if (oldData == null) return;
+
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page) => {
+            return {
+              ...page,
+              tweets: page.tweets.filter(
+                (tweet) => tweet.id !== deletedTweet.id,
+              ),
+            };
+          }),
+        };
+      };
+      trpcUtils.tweet.infiniteFeed.setInfiniteData({}, updateData);
+    },
+  });
+
   return (
     <li className="flex gap-4 border-b px-4 py-4">
       <Link href={`/profiles/${user.id}`}>
         <ProfileImage src={user.image} />
       </Link>
-      <div className="flex flex-grow flex-col">
-        <div className="flex gap-1">
-          <Link
-            href={`/profiles/${user.id}`}
-            className="font-bold outline-none hover:underline focus-visible:underline"
-          >
-            {user.name}
-          </Link>
-          <span className="text-gray-500">-</span>
+      <div className="flex flex-grow  flex-col">
+        <div className="flex gap-4">
+          <div className="flex gap-1">
+            <Link
+              href={`/profiles/${user.id}`}
+              className="font-bold outline-none hover:underline focus-visible:underline"
+            >
+              {user.name}
+            </Link>
+            <span className="text-gray-500">-</span>
+            <span className="text-gray-500">
+              {dateTimeFormatter.format(createdAt)}
+            </span>
+          </div>
           <span className="text-gray-500">
-            {dateTimeFormatter.format(createdAt)}
+            <DeleteButton
+              isLoading={deleteTweet.isLoading}
+              userId={user.id}
+              onClick={() => deleteTweet.mutate({ id })}
+            />
           </span>
         </div>
         <p className="whitespace-pre-wrap">{content}</p>
